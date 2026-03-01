@@ -237,36 +237,34 @@
   filter: drop-shadow(0 25px 40px rgba(0,0,0,.35));
 }
 .popup-overlay{
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background: rgba(0,0,0,.7);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
-
-.popup-overlay.show{
-  display:flex;
-}
+.popup-overlay.show{ display:flex; }
 
 .popup-box{
-  width: min(600px, 95vw);
-  max-height: 80vh;
-  overflow-y: auto;
+  width: min(720px, 95vw);
+  height: min(80vh, 700px);
   background: #0f2f45;
   border-radius: 12px;
-  padding: 15px;
+  overflow: hidden;
   box-shadow: 0 20px 50px rgba(0,0,0,.5);
   color: white;
+  border: 1px solid rgba(255,255,255,.15);
 }
 
 .popup-header{
   display:flex;
   justify-content: space-between;
   align-items:center;
-  margin-bottom:10px;
-  font-weight: bold;
+  padding: 12px 14px;
+  font-weight: 800;
+  background: rgba(0,0,0,.25);
+  border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 .popup-header button{
@@ -275,6 +273,13 @@
   color: white;
   font-size: 18px;
   cursor: pointer;
+}
+
+.offers-frame{
+  width: 100%;
+  height: calc(100% - 48px);
+  border: 0;
+  background: #0f2f45;
 }
   </style>
 </head>
@@ -347,60 +352,40 @@
     document.getElementById("gp").href = GOOGLE_PLAY_URL;
     document.getElementById("as").href = APP_STORE_URL;
     document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-  <div class="bottom-character">
-  <img src="C:\Users\ULTRAPC\Desktop\CPA\clash\logo2.png" alt="Character">
-</div>
-<!-- Offers Popup -->
 <div id="offersPopup" class="popup-overlay">
   <div class="popup-box">
     <div class="popup-header">
       <span>Sponsored Offers</span>
-      <button id="closePopup">✕</button>
+      <button id="closePopup" type="button">✕</button>
     </div>
 
-    <div id="offersContent"></div>
+    <iframe id="offersFrame" class="offers-frame" src="about:blank"></iframe>
   </div>
 </div>
-<script>
-let offersLoaded = false;
+  <script>
+  const popup = document.getElementById("offersPopup");
+  const frame = document.getElementById("offersFrame");
 
-function loadOffersIntoPopup() {
-  if (offersLoaded) return;
-  offersLoaded = true;
+  document.getElementById("claimBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    popup.classList.add("show");
 
-  // Config script
-  const configScript = document.createElement("script");
-  configScript.type = "text/javascript";
-  configScript.innerHTML = 'var FQcuA_lGR_nYzadc={"it":4567138,"key":"884e1"};';
-  document.getElementById("offersContent").appendChild(configScript);
+    // Load offers page inside iframe (reliable)
+    frame.src = "offers.html";
+  });
 
-  // External script
-  const mainScript = document.createElement("script");
-  mainScript.src = "https://d3v3431sr9puku.cloudfront.net/8e668bb.js";
-  mainScript.async = true;
+  document.getElementById("closePopup").addEventListener("click", () => {
+    popup.classList.remove("show");
+    frame.src = "about:blank"; // stop the offers when closing
+  });
 
-  document.getElementById("offersContent").appendChild(mainScript);
-}
-
-// Open popup on button click
-document.getElementById("claimBtn").addEventListener("click", function(e){
-  e.preventDefault();
-  document.getElementById("offersPopup").classList.add("show");
-  loadOffersIntoPopup();
-});
-
-// Close popup
-document.getElementById("closePopup").addEventListener("click", function(){
-  document.getElementById("offersPopup").classList.remove("show");
-});
-
-// Close when clicking outside
-document.getElementById("offersPopup").addEventListener("click", function(e){
-  if(e.target === this){
-    this.classList.remove("show");
-  }
-});
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+      popup.classList.remove("show");
+      frame.src = "about:blank";
+    }
+  });
 </script>
 </body>
+
 </html>
